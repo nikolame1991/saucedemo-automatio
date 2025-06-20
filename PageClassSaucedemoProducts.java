@@ -14,28 +14,33 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+/**
+ * Page Object Model class for verifying product page functionality on SauceDemo.
+ * Includes interaction with product details, cart, checkout flow, and validations.
+ */
 public class PageClassSaucedemoProducts {
 	WebDriver driver;
 	Actions actions;
 	WebDriverWait wait;
 
-	// Element
-	@FindBy(css = ".app_logo") // Provera naslova
+	// -------------------- Web Elements --------------------
+
+	@FindBy(css = ".app_logo")
 	WebElement headingMiddle;
 
-	@FindBy(css = ".bm-burger-button") // Provera dugme "Hamburg"
+	@FindBy(css = ".bm-burger-button")
 	WebElement clickHamburg;
 
 	@FindBy(css = "#react-burger-cross-btn")
 	WebElement clickCloseHamburg;
-	/*-----------------------------------------------------------*/
-	@FindBy(css = "#item_4_img_link > img") // kliknuti sliku
+
+	@FindBy(css = "#item_4_img_link > img")
 	WebElement clickImg;
 
-	@FindBy(css = ".inventory_details_name.large_size") // Provera naslov proizvoda
+	@FindBy(css = ".inventory_details_name.large_size")
 	WebElement checkText;
 
-	@FindBy(css = ".inventory_details_desc.large_size") // Provera dugackih tekstova
+	@FindBy(css = ".inventory_details_desc.large_size")
 	WebElement checkLongText;
 
 	@FindBy(css = ".inventory_details_price")
@@ -58,7 +63,7 @@ public class PageClassSaucedemoProducts {
 
 	@FindBy(css = "#continue-shopping")
 	WebElement clickButtonContinueShopping;
-	/*----------------------------------------------------------*/
+
 	@FindBy(css = ".pricebar #add-to-cart-sauce-labs-bolt-t-shirt")
 	WebElement clickTshirt;
 
@@ -95,9 +100,11 @@ public class PageClassSaucedemoProducts {
 	@FindBy(css = "button#back-to-products")
 	WebElement backHomeButton;
 
-	/*---------------------------------------------------*/
+	// -------------------- Constructor --------------------
 
-	// Konstruktor
+	/**
+	 * Constructor initializes WebDriver, WebDriverWait, Actions, and PageFactory.
+	 */
 	public PageClassSaucedemoProducts(WebDriver driver) {
 		this.driver = driver;
 		this.actions = new Actions(driver);
@@ -105,168 +112,135 @@ public class PageClassSaucedemoProducts {
 		PageFactory.initElements(driver, this);
 	}
 
-	// Metod
+	// -------------------- Methods --------------------
+
+	/** Verifies main header "Swag Labs" is visible */
 	public void headingMiddle() {
 		WebElement textMain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".app_logo")));
-
-		// Uzimanja teksta iz elementa
-		String actualMiddleText = textMain.getText();
-		String expectedMiddleText = "Swag Labs";
-
-		// Asertacija da li su naslovi isti
-		assertTrue(actualMiddleText.equals(expectedMiddleText), "Nije dobar naslov");
+		String actual = textMain.getText();
+		String expected = "Swag Labs";
+		assertTrue(actual.equals(expected), "Header is incorrect.");
 	}
 
-	// Dugme za slidebar hamburg
+	/** Opens sidebar (hamburger) menu */
 	public void clickHamburg() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.elementToBeClickable(clickHamburg)).click();
 	}
 
-	// Dugme za zatvaranje slidebar hamburg
+	/** Closes sidebar menu if present */
 	public void clickCloseHamburg() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		try {
-			WebElement closeBtn = wait
-					.until(ExpectedConditions.visibilityOfElementLocated(By.id("react-burger-cross-btn")));
-			if (closeBtn.isDisplayed()) {
-				closeBtn.click();
-			}
+			WebElement closeBtn = wait.until(ExpectedConditions.visibilityOf(clickCloseHamburg));
+			if (closeBtn.isDisplayed()) closeBtn.click();
 		} catch (TimeoutException e) {
-			System.out.println("Dugme za zatvaranje hamburger menija nije pronađeno na stranici.");
-		} catch (Exception e) {
-			System.out.println("Došlo je do greške pri zatvaranju hamburger menija: " + e.getMessage());
+			System.out.println("Sidebar close button not found.");
 		}
 	}
 
-	/*-----------------------------------------------------------*/
-	// kliknuti sliku
+	/** Clicks on product image */
 	public void clickImg() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 		wait.until(ExpectedConditions.elementToBeClickable(clickImg)).click();
 	}
 
-	// Provera naslov proizvoda
+	/** Verifies product title is correct */
 	public void checkText() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".inventory_details_name.large_size")));
-
-		String actualTextCheck = checkText.getText();
-		String expectedTextCheck = "Sauce Labs Backpack";
-
-		assertTrue(actualTextCheck.equals(expectedTextCheck), "Nije dobar podnaslov");
+		wait.until(ExpectedConditions.visibilityOf(checkText));
+		assertTrue(checkText.getText().equals("Sauce Labs Backpack"), "Product title mismatch.");
 	}
 
-	// Provera skraceni tekst
+	/** Verifies product description contains expected substring */
 	public void checkLongText() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-		WebElement longTextCheck = wait.until(
-				ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".inventory_details_desc.large_size")));
-
-		String actualTextLongContains = longTextCheck.getText();
-		String expectedTextLongContains = "carry.";
-
-		assertTrue(actualTextLongContains.contains(expectedTextLongContains), "Nije dobro skracen");
+		wait.until(ExpectedConditions.visibilityOf(checkLongText));
+		assertTrue(checkLongText.getText().contains("carry."), "Product description mismatch.");
 	}
 
-	// Proveriti ispisanu cenu
+	/** Verifies product price is as expected */
 	public void checkPrice() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-		WebElement priceCheck = wait
-				.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".inventory_details_price")));
-
-		String actualPriceCheck = priceCheck.getText();
-		String expectedPriceCheck = "$29.99";
-
-		assertTrue(actualPriceCheck.equals(expectedPriceCheck), "Nije dobra cena");
+		wait.until(ExpectedConditions.visibilityOf(checkPrice));
+		assertTrue(checkPrice.getText().equals("$29.99"), "Product price is incorrect.");
 	}
 
-	// provera dugme "Add to cart"
+	/** Clicks "Add to Cart" */
 	public void checkButtonAddToCart() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-		WebElement buttonAddToCart = wait
-				.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#add-to-cart")));
-		buttonAddToCart.click();
+		wait.until(ExpectedConditions.visibilityOf(checkButtonAddToCart)).click();
 	}
 
-	// pRovera dugme "Remove"
+	/** Clicks "Remove" button */
 	public void checkButtonRemove() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-		WebElement buttonRemove = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#remove")));
-		buttonRemove.click();
+		wait.until(ExpectedConditions.visibilityOf(checkButtonRemove)).click();
 	}
 
-	// provera dugme "Add to cart" PONOVO
+	/** Clicks "Add to Cart" again */
 	public void checkButtonAddToCartAgain() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-		WebElement buttonAddToCart = wait
-				.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#add-to-cart")));
-		buttonAddToCart.click();
+		wait.until(ExpectedConditions.visibilityOf(checkButtonAddToCartAgain)).click();
 	}
 
-	// Provera link Korpa
+	/** Clicks on shopping cart icon */
 	public void checkShoppingCartLink() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-		WebElement linkShoppingCartLink = wait
-				.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".shopping_cart_link")));
-		linkShoppingCartLink.click();
+		wait.until(ExpectedConditions.visibilityOf(checkShoppingCartLink)).click();
 	}
 
-	// Provera dugme "Remove" iz "Shopping Cart Link"
+	/** Removes item from cart */
 	public void removeFromShoppingCartLink() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-		WebElement removeShoppingCartLink = wait.until(ExpectedConditions
-				.visibilityOfElementLocated(By.cssSelector(".btn.btn_secondary.btn_small.cart_button")));
-		removeShoppingCartLink.click();
+		wait.until(ExpectedConditions.visibilityOf(removeFromShoppingCartLink)).click();
 	}
 
-	/*----------------------------------------------------------------*/
+	/** Clicks add-to-cart on T-shirt */
 	public void verifyTShirt() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-		wait.until(ExpectedConditions
-				.elementToBeClickable(By.cssSelector(".pricebar #add-to-cart-sauce-labs-bolt-t-shirt"))).click();
+		wait.until(ExpectedConditions.elementToBeClickable(clickTshirt)).click();
 	}
 
+	/** Clicks shopping cart icon */
 	public void clickCartIcon() {
 		wait.until(ExpectedConditions.elementToBeClickable(cartIcon)).click();
 	}
 
+	/** Clicks checkout button */
 	public void clickCheckoutButton() {
 		wait.until(ExpectedConditions.elementToBeClickable(checkoutButton)).click();
 	}
 
+	/** Inputs first name */
 	public void enterFirstName(String firstName) {
 		wait.until(ExpectedConditions.visibilityOf(firstNameInput)).sendKeys(firstName);
 	}
 
+	/** Inputs last name */
 	public void enterLastName(String lastName) {
 		wait.until(ExpectedConditions.visibilityOf(lastNameInput)).sendKeys(lastName);
 	}
 
+	/** Inputs postal code */
 	public void enterPostalCode(String postalCode) {
 		wait.until(ExpectedConditions.visibilityOf(postalCodeInput)).sendKeys(postalCode);
 	}
 
+	/** Clicks Continue in checkout */
 	public void clickContinueButton() {
 		wait.until(ExpectedConditions.elementToBeClickable(continueButton)).click();
 	}
 
+	/** Checks if checkout summary info is visible */
 	public boolean isSummaryInfoVisible() {
 		return wait.until(ExpectedConditions.visibilityOf(summaryInfo)).isDisplayed();
 	}
 
+	/** Finalizes checkout */
 	public void clickFinishButton() {
 		wait.until(ExpectedConditions.elementToBeClickable(finishButton)).click();
 	}
 
+	/** Gets final confirmation header text */
 	public String getCompleteHeaderText() {
 		return wait.until(ExpectedConditions.visibilityOf(completeHeaderText)).getText();
 	}
 
+	/** Verifies that Pony Express image is visible */
 	public boolean isPonyImageVisible() {
 		return wait.until(ExpectedConditions.visibilityOf(ponyImage)).isDisplayed();
 	}
 
+	/** Clicks "Back Home" button */
 	public void clickBackHomeButton() {
 		wait.until(ExpectedConditions.elementToBeClickable(backHomeButton)).click();
 	}
