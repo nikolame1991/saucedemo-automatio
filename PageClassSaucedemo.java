@@ -14,12 +14,17 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+/**
+ * Page Object class for handling login-related functionality on the SauceDemo site.
+ * Contains methods for entering credentials, clicking login, and verifying error messages.
+ */
 public class PageClassSaucedemo {
 	WebDriver driver;
 	Actions actions;
 	WebDriverWait wait;
 
-	// Elementi
+	// -------------------- Web Elements --------------------
+
 	@FindBy(css = "#root > div > div.login_logo")
 	public WebElement loginLogo;
 
@@ -41,13 +46,13 @@ public class PageClassSaucedemo {
 	@FindBy(css = "div.error-message-container.error")
 	public WebElement errorMessageBox;
 
-	/*
-	 * @FindBy(css = "#login_credentials") public WebElement showLoginCredentials;
-	 * 
-	 * @FindBy(css = "#login_password") public WebElement showLoginPassword;
-	 */
+	// -------------------- Constructor --------------------
 
-	// Konstruktor
+	/**
+	 * Initializes WebDriver, Actions, WebDriverWait and PageFactory elements.
+	 * 
+	 * @param driver WebDriver instance
+	 */
 	public PageClassSaucedemo(WebDriver driver) {
 		this.driver = driver;
 		this.actions = new Actions(driver);
@@ -55,56 +60,70 @@ public class PageClassSaucedemo {
 		PageFactory.initElements(driver, this);
 	}
 
-	// Metod
-	// Provera naslova
-	public void loginLogo(String logoLogin) {
-		// sacekati dok se ne pojavi "Naslov" element
-		WebElement mainTitle = wait
-				.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#root > div > div.login_logo")));
+	// -------------------- Methods --------------------
 
-		// Uzimanja teksta iz elementa
+	/**
+	 * Verifies that the login logo text matches the expected title.
+	 * Waits until the element is visible and compares its text.
+	 */
+	public void loginLogo(String logoLogin) {
+		WebElement mainTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.cssSelector("#root > div > div.login_logo")));
+
 		String actualMainTitle = mainTitle.getText();
 		String expectedMainTitle = "Swag Labs";
 
-		// Asertacija da li su naslovi isti
-		assertTrue(actualMainTitle.equals(expectedMainTitle), "Nije dobar naslov");
+		assertTrue(actualMainTitle.equals(expectedMainTitle), "Login page title is incorrect.");
 	}
 
-	// Metod za login
+	/**
+	 * Enters the username into the username input field.
+	 * 
+	 * @param username The username to input
+	 */
 	public void usernamePlaceholder(String username) {
 		placeholderUserName.sendKeys(username);
 		placeholderUserName.click();
 	}
 
-	// Metod za password
+	/**
+	 * Enters the password into the password input field.
+	 * 
+	 * @param password The password to input
+	 */
 	public void passwordPlaceholder(String password) {
 		placehodlerPassword.sendKeys(password);
 		placehodlerPassword.click();
 	}
 
-	// Metod za dugme
+	/**
+	 * Clicks the login button after waiting until it's clickable.
+	 */
 	public void clickLoginButton() {
-		wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.elementToBeClickable(clickLoginButton)).click();
 	}
 
-	// za prikaz 2 SVG ikonice za greske
+	/**
+	 * Verifies that two input error icons (SVG) are displayed after invalid login.
+	 */
 	public void checkInputErrorIconsDisplayed() {
 		wait.until(ExpectedConditions.visibilityOfAllElements(inputErrorIcons));
-		// Provera da li su oba prikazana
-		assertTrue(inputErrorIcons.size() == 2, "Nisu prikazane obe ikone za gresku");
+		assertTrue(inputErrorIcons.size() == 2, "Both input error icons are not displayed.");
 	}
 
-	// prikaz za drugo dugme "X"
+	/**
+	 * Verifies that the "X" close button in the error message is displayed.
+	 */
 	public void checkCloseErrorButtonDisplayed() {
 		wait.until(ExpectedConditions.visibilityOf(closeErrorButton));
-		assertTrue(closeErrorButton.isDisplayed(), "X dugme za zatvaranje nije prikazano");
+		assertTrue(closeErrorButton.isDisplayed(), "The close (X) button is not visible.");
 	}
 
-	// Poruka za greske
+	/**
+	 * Verifies that the error message box is displayed on failed login.
+	 */
 	public void checkErrorMEssageBoxDisplayed() {
 		wait.until(ExpectedConditions.visibilityOf(errorMessageBox));
-		assertTrue(errorMessageBox.isDisplayed(), "Poruka o gresci nije prikazana");
+		assertTrue(errorMessageBox.isDisplayed(), "The error message box is not displayed.");
 	}
-
 }
